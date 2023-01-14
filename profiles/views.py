@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Profile
 from .serializers import ProfileSerializer
+from drf_api.permissions import isOwnerOrReadOnly
 
 class ProfileListView(APIView):
     """ 
@@ -13,13 +14,17 @@ class ProfileListView(APIView):
     """
     def get(self, request):
         profiles = Profile.objects.all()
-        serializer = ProfileSerializer(profiles, many=True)
+        serializer = ProfileSerializer(
+            profiles, many=True, context={'request': request})
         return Response(serializer.data)
 
 
 class ProfileDetailView(APIView):
     # set serializer class to render a form
     serializer_class = ProfileSerializer
+    # set permissions array containing permission classes.
+    permission_classes = [isOwnerOrReadOnly]
+
     def get_object(self, pk):
         """
         try to get the oject for a specific profile
@@ -29,6 +34,7 @@ class ProfileDetailView(APIView):
         """
         try:
             profile = Profile.objects.get(pk=pk)
+            self.check_object_permissions(self.request, profile)
             return profile
         except:
             raise Http404
@@ -40,12 +46,14 @@ class ProfileDetailView(APIView):
         return serialized data to the specified url in urls.py
         """
         profile = self.get_object(pk)
-        serializer = ProfileSerializer(profile)
+        serializer = ProfileSerializer(
+            profile, context={'request': request})
         return Response(serializer.data)
 
     def put(self, request, pk):
         profile = self.get_object(pk)
-        serializer = ProfileSerializer(profile, data=request.data)
+        serializer = ProfileSerializer(
+            profile, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
