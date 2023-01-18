@@ -52,7 +52,7 @@ class PostDetailView(APIView):
             post = Post.objects.get(pk=pk)
             self.check_object_permissions(self.request, post)
             return post
-        except:
+        except Post.DoesNotExist:
             raise Http404
 
     def get(self, request, pk):
