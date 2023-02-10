@@ -1,7 +1,8 @@
 from rest_framework import generics, permissions
 from drf_api.permissions import isOwnerOrReadOnly
-from .models import Like
-from .serializers import LikeSerializer
+from likes.models import Like
+from likes.serializers import LikeSerializer
+
 
 class LikeListView(generics.ListCreateAPIView):
     """
@@ -14,7 +15,11 @@ class LikeListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
 class LikeDetailView(generics.RetrieveDestroyAPIView):
-    permission_classes =[isOwnerOrReadOnly]
+    """
+    Retrieve a like or delete it by id if you own it.
+    """
+    permission_classes = [isOwnerOrReadOnly]
     serializer_class = LikeSerializer
     queryset = Like.objects.all()
