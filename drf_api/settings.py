@@ -121,13 +121,14 @@ if 'CLIENT_ORIGIN' in os.environ:
     ]
 else:
     CORS_ORIGIN_WHITELIST = [
-    'https://localhost:8000'
+    'http://localhost:8000',
+    'http://localhost:3000',
+
     ]
     if 'CLIENT_ORIGIN_DEV' in os.environ:
-        extracted_url = re.match(r'^.+-', os.environ.get('CLIENT_ORIGIN_DEV', ''), re.IGNORECASE).group(0)
-        CORS_ALLOWED_ORIGIN_REGEXES = [
-            rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
-        ]
+        CORS_ALLOWED_ORIGINS = [
+        os.environ.get('CLIENT_ORIGIN_DEV')
+    ]
 
 
 ROOT_URLCONF = 'drf_api.urls'
